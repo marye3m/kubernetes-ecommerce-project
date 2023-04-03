@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: notifications-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      component: notifications-api
+    
+  template:
+    metadata:
+      labels:
+        component: notifications-api
+    spec:
+      containers:
+        - name: notifications-api
+          image: laithharb/notifications-api:v2
+          ports:
+            - containerPort: 5001
+          # env:
+          #   - name: TWILIO_ACCOUNT_SID 
+          #     value: AC72682e7d8ed1aa74673e68f5ae9e8557
+          #   - name: TWILIO_AUTH_TOKEN 
+          #     value: 765a55f04e8b9e705642e2f1615ac61d
+          #   - name: TWILIO_NUMBER
+          #     value: "+18573714765"
+          env:
+            - name: TWILIO_ACCOUNT_SID 
+              valueFrom: 
+                secretKeyRef:
+                  name: twilio-secret
+                  key: TWILIO_ACCOUNT_SID 
+            - name: TWILIO_AUTH_TOKEN 
+              valueFrom: 
+                secretKeyRef:
+                  name: twilio-secret
+                  key: TWILIO_AUTH_TOKEN
+            - name: TWILIO_NUMBER
+              valueFrom: 
+                secretKeyRef:
+                  name: twilio-secret
+                  key: TWILIO_NUMBER    
+   # Apply the following command 'kubectl apply -f .\k8s\notifications-api-deployment.yaml'
+   # To get the secrets, use this command: 'kubectl get secrets'  
+   # Note: But our secrets are not encrypted someone on our machine and get it using the following commands easily
+   # 'kubectl get secret twilio-secret -o yaml', This command will open the yaml file which stores our secret with the file name "twilio-secret"
+   # It seems encrypted but not it is based 64 bit encoded(i.e very easily decoded) it is not encrypted
+   # E.g To easily decode the TWILIO_NUMBER Part, you can do it easily with the following command.
+   # 'echo <the base 64 encoded code> | base64 -d' # not slash pipe operator(This command works on gitbush, but not on Powershell)
+   # The result will be the our original number(+18573714765)
+# PS C:\dev\kubernetes-ecommerce-project> kubectl get secret twilio-secret -o yaml
+# apiVersion: v1
+# data:
+#   TWILIO_ACCOUNT_SID: QUM3MjY4MmU3ZDhlZDFhYTc0NjczZTY4ZjVhZTllODU1Nw==
+#   TWILIO_AUTH_TOKEN: NzY1YTU1ZjA0ZThiOWU3MDU2NDJlMmYxNjE1YWM2MWQ=
+#   TWILIO_NUMBER: KzE4NTczNzE0NzY1
+# kind: Secret
+# metadata:
+#   creationTimestamp: "2023-03-29T10:34:37Z"
+#   name: twilio-secret
+#   namespace: default
+#   resourceVersion: "137521"
+#   uid: 64b5b826-a4fe-4922-89de-db20e2c98ce4
+# type: Opaque
+   #
+   # So, to solve this problem:                 
+ #Please Don't Store the above sensitive information here in the code 
+ # You can use another kubernetes Object called  a "Secret"  using a manifist file 
+ # Example "kubectl create secret geneeric twilio-secret --from-literal TWILIO_NUMBER=123"
+ # For our case '  kubectl create secret generic twilio-secret --from-literal=TWILIO_ACCOUNT_SID=AC72682e7d8ed1aa74673e68f5ae9e8557 --from-literal=TWILIO_AUTH_TOKEN=765a55f04e8b9e705642e2f1615ac61d --from-literal=TWILIO_NUMBER="+18573714765"    
+# Output secret/twilio-secret created'           
+            # - name: RABBITMQ_HOST
+            #   value: "rabbitmq-cluster-ip-service"
+            # - name: RABBITMQ_PORT
+            #   value: "5672"
+          envFrom:
+            - configMapRef:
+                name: rabbitmq-configmap
+
+# All set!!! But storing sensetive infromation in this way is not recommended
+# It is redundancy in each individual files
+# just find out anther option my friend which is called "ConfigMaps" for 
+# Commonly used environment variables
+
+    # Run the following command to apply 
+    # on the root directory run this command "kubectl apply -f k8s"
+    # To check weather it is running well or not run this command 'kubectl get pods'
+    # and if you check 'kubectl logs <running notifications-api-id>', it will show you errot due to rabbitmq not yet setup

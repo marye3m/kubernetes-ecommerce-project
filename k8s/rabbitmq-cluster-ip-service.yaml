@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service 
+metadata:
+  name: rabbitmq-cluster-ip-service
+
+spec:
+  selector:
+    component: rabbitmq
+  ports:
+    - name: rabbitmq
+      protocol: TCP
+      port: 5672
+      targetPort: 5672
+
+
+
+      # Save and run "kubectl apply -f k8s". Then you will see rabbitmq deployment and services created
+      # Check all pods weather it works fine or not using the following commands
+      # 'kubectl logs <pod id>', but to get its pod id  you cand run 'kubectl get pods'
+      # Unfortunately when you tried the 'kubectl logs <notifications-api pod id>' for both,
+      # it doesn't work. so you have to delete them first using the following commands
+      # 'kubectl delete pod <notifications-api pod id>' for both of them
+      # Then try 'kubectl get pods'
+      # and 'kubectl logs <notifications-api pod id>'
+      # Fingers cross !!! it works with "Listening on PORT 5000" in our case for this example

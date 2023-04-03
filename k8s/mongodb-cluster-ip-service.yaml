@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-cluster-ip-service
+
+spec:
+  selector:
+    component: mongodb
+  ports:
+    - name: db
+      protocol: TCP
+      port: 27017
+      targetPort: 27017
+# To Run and Apply follow the following steps
+# 1. kubectl get services , this command list all running pods
+# 2. 'bukectl apply -f mongodb-cluster-ip-service.yaml'
+# 3. It will create the service, and notify you 'service/mongodb-cluster-ip-service' created
+# 4. repeat step 1 to view all running services
+# 5. Any pod/service are not running you can kill and re-create them using the following commands
+# To kill the pod 'kubectl delete<pod/service name.yaml>'
+# To re-create "kubectl apply -f <pod/service name.yaml>"
+# To the status or log use this command 'kubectl logs <pod name>'
+# Note: the metadata name in the mongodb-cluster-ip-service is used to connect to mongodb and serve as a MONGO_URI. like the following
+# 'mongoose.connect("mongodb://mongodb-cluster-ip-service/products")', it is used instead of localhost

@@ -1,0 +1,63 @@
+# # Rename 'mongodb-pod.yaml' with 'mongodb-deployment.yaml'
+# apiVersion: v1 
+# kind: Pod
+# metadata:
+#   name: mongodb
+#   labels:
+#     component: mongodb
+#   spec:
+#     containers:
+#       - name: mongodb
+#         image: mongo
+#         ports: 
+#           - containerPort: 27017
+# # To Run and Apply follow the following steps
+# # 1. kubectl get pods , this command list all running pods
+# # 2. 'bukectl apply -f mongodb-pod.yaml'
+# # 3. It will create the pod, and notify you 'pod/mongodb' created
+# # 4. repeat step 1 to view all running pods
+
+#=====================================================
+
+# For Production (Deployment)
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: mongodb
+  template: 
+    metadata:
+      labels:
+        component: mongodb 
+    spec:
+      containers: 
+        - name: mongodb 
+          image: mongo 
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - mountPath: /data/db
+              name: mongodb-storage
+      volumes:
+        - name: mongodb-storage
+          persistentVolumeClaim:
+            claimName: mongodb-persistent-volume-claim
+    #=======================================
+    # Note: After "deployment.yaml" and "cluster-ip-service.yaml"  all set
+    # 1. open up your terminal and cd  to your root project directory and 'kubectl get all', which will show you all running pods and services
+    # 2. Tire down all pods and service with the following command
+    # 'kubectl delete all --all', which removes all single resources currently running
+    # To check run the following command 'kubectl get services', you will get one kubernetes internal service only
+    # You can double check it with "kubectl get all", you will get only kubernetes internal cluster service. Everything else is gone.
+  # All set but to run every single file in the k8s directory(deployment and service.yaml fils)
+  # inside the 'k8s' directory one-by-one with 'kubectl apply -f <each-single-file-name.yaml>' is tiresome.
+  # So, We can do it with only one command as follows,
+  # 'cd ..' out from 'k8s directory' and land on root directory, then apply the following command.
+  # 'kubectl apply -f k8s'
+  # if there is no any error all set and with statuses like this(unchanged|configured|created). if there is any error correct them.
+  # To check all running pods use the following command.
+  # 'kubectl get pods'

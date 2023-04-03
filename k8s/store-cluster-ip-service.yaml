@@ -1,0 +1,39 @@
+# # before it is renamed from 'store-node-port-service.yaml' to 'store-cluster-ip-service.yaml' file
+# apiVersion: v1
+# kind: Service # Service is a kubernetes object
+# metadata:
+#   name: store-node-port-service
+# spec:
+#   type: NodePort
+
+#   ports:
+#   - port: 80 # the '-' implies the ports part accepts an array
+#     targetPort: 80
+#     nodePort: 31600
+#   selector:
+#     component: store
+  
+# #before run and apply you can get all running service using the following command
+# # 'kubectl get services'
+# # To apply the service run the following command
+# # 'kubectl apply -f store-node-port-service.yaml'
+# # Result : 'service/store-node-port-service' created
+# # if we 'kubectl get services' we will see our service is running 
+# # if we browse (localhost:31660, rather than localhost:80) we will view our store on the browser
+
+#-----------------------------
+# It is pretty much similar to the above code, except change 
+#type: 'NodePort' to 'ClusterIP' and get ride of the nodePort: '31600', we don't need it any more
+
+apiVersion: v1
+kind: Service # Service is a kubernetes object
+metadata:
+  name: store-node-port-service
+spec:
+  type: ClusterIP
+
+  ports:
+  - port: 80 # the '-' implies the ports part accepts an array
+    targetPort: 80
+  selector:
+    component: store
